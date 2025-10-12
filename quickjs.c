@@ -52447,7 +52447,7 @@ void JS_AddIntrinsicBaseObjects(JSContext *ctx)
                       JS_PROP_HAS_CONFIGURABLE | JS_PROP_CONFIGURABLE);
     JS_FreeValue(ctx, js_object_seal(ctx, JS_UNDEFINED, 1, (JSValueConst *)&ctx->throw_type_error, 1));
 
-    ctx->global_obj = JS_NewObject(ctx);
+    if (!JS_IsObject(ctx->global_obj)) ctx->global_obj = JS_NewObject(ctx);
     ctx->global_var_obj = JS_NewObjectProto(ctx, JS_NULL);
 
     /* Object */
@@ -52644,6 +52644,24 @@ void JS_AddIntrinsicBaseObjects(JSContext *ctx)
 
     /* BigInt */
     JS_AddIntrinsicBigInt(ctx);
+}
+
+void JS_SetGlobalObject(JSContext *ctx, JSValue obj, int keep)
+{
+    ctx->global_obj = obj;
+	if (keep > 0) {  /* global properties */
+		JS_AddIntrinsicBaseObjects(ctx);
+		JS_AddIntrinsicDate(ctx);
+		JS_AddIntrinsicEval(ctx);
+		JS_AddIntrinsicStringNormalize(ctx);
+		JS_AddIntrinsicRegExp(ctx);
+		JS_AddIntrinsicJSON(ctx);
+		JS_AddIntrinsicProxy(ctx);
+		JS_AddIntrinsicMapSet(ctx);
+		JS_AddIntrinsicTypedArrays(ctx);
+		JS_AddIntrinsicPromise(ctx);
+		JS_AddIntrinsicWeakRef(ctx);
+	}
 }
 /* Typed Arrays */
 
